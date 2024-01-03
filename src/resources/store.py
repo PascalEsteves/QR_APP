@@ -12,7 +12,7 @@ blb = Blueprint(
 
 blb.route("/store/<int:store_id>")
 class Store(MethodView):
-    
+
     @blb.response(200, StoreSchema)
     def get(self, store_id):
         """
@@ -22,7 +22,13 @@ class Store(MethodView):
         """
         store = StoreModel.query.get_or_404(store_id)
         return store
-    
+    def delete(self, store_id):
+        """Delete a specific store"""
+        store = StoreModel.query_get_or_404(store_id)
+        db.session.delete(store)
+        db.commit()
+        return {"message":"Store successfully deleted"},200
+
 blb.route("/store")
 class StoreList(MethodView):
 
@@ -32,11 +38,11 @@ class StoreList(MethodView):
         Get all the stores in database
         Args:
             :params None
-        Return 
+        Return
             List of stores
         """
         return StoreModel.query.all()
-    
+
     @blb.arguments(StoreSchema)
     @blb.response(201, StoreSchema)
     def post(self, store_data: dict):
@@ -44,7 +50,7 @@ class StoreList(MethodView):
         Add New store to database
         Args:
             :params store data
-        Return 
+        Return
             store
         """
         store = StoreModel(**store_data)
